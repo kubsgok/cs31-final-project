@@ -1,0 +1,17 @@
+# Midway Reflection — DRAFT (Siri & Kabir)
+*Draft to edit before pasting into the Preliminary Workflow & Document. Change anything that doesn't match your experience.*
+
+## Accomplishments
+1. **The full recommendation pipeline works on a real CSV.** The notebook loads a practice-history CSV and a 20-problem bank, checks the columns and values, and returns 5 recommended problems with LeetCode links and a plain-language reason for each. On our sample history it flags Graphs (est. 32%) and Dynamic Programming (est. 48%) as weakest and recommends retries of the problems we failed (Clone Graph, Climbing Stairs, House Robber) plus new Graphs problems.
+2. **We implemented the Bayesian mastery model with forgetting.** Each topic has a Beta(1,1) prior, and every attempt adds evidence weighted by `0.5^(days_ago / half_life)`. The notebook shows each estimate with an 80% credible interval, so topics with little data look uncertain rather than mastered. This follows the mitigation we committed to in our harm analysis.
+3. **We built the Thompson-sampling bandit with a deadline term, and the notebook can be customized.** Topic choice balances weakness against uncertainty, with an urgency term that rises as the interview gets closer. A "Make it yours" section re-runs the recommender with a 3-day deadline, a 30-day half-life, and a newly logged attempt, so a user can see what each setting changes.
+
+## Struggles and Blockers
+1. **The deadline effect is weak on our sample data.** All of our sample attempts are from the last 3 weeks, so "staleness" barely differs between topics and changing the interview date only slightly changes the list. *Remedy:* build longer, more varied synthetic histories (including topics left untouched for 30+ days) and tune the urgency/staleness scaling. We'll bring the scoring formula to office hours to check that it's a reasonable way to combine a bandit with a deadline.
+2. **We haven't validated the model yet.** We don't know whether a half-life of 14 days or the "needs more practice" thresholds are calibrated. With so few attempts, the credible intervals are very wide. *Remedy:* the simulated-student evaluation (below) will check calibration, and we'll ask course staff how to judge "good enough" calibration for a project this size.
+3. **Dividing the work.** *(Edit to match your experience, e.g. how you two split the model code, the notebook writing, and the evaluation going forward.)*
+
+## Next Step Summary
+Our next milestone is the **simulated-learner evaluation** described in our proposal. We will create simulated students with hidden per-topic skill levels at several starting points (beginner, uneven, strong). Each solved problem will raise skill in its topic, and skill will decay over time using the same half-life idea. Each student will get the same budget of practice problems from three policies: our recommender, a random list, and a fixed Blind-75-style order. We'll compare final average skill and the score on a simulated assessment across many random seeds, and plot the learning curves.
+
+Alongside this, we will (1) test whether our 80% intervals contain the simulated student's true skill about 80% of the time, especially for beginners, which our harm analysis identified as the group most at risk of bad recommendations; (2) use those simulations to tune `HALF_LIFE_DAYS` and the urgency formula so the interview date has a meaningful effect; and (3) if time allows, add problem difficulty (Easy/Medium/Hard) so that a solved Hard counts more than a solved Easy.
