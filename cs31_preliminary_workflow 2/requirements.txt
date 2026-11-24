@@ -1,6 +1,0 @@
-# Fallback only: the CS-31 course environment (cs31_env, Python 3.13) already has all of these.
-# Versions match the course uv.lock.
-numpy==2.5.2
-pandas==3.0.5
-matplotlib==3.11.1
-ipykernel==7.3.0
